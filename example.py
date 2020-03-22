@@ -1,7 +1,8 @@
-from jsonfeed_wrapper import JSONFeedWrapper
+import jsonfeed_wrapper as jfw
 import jsonfeed as jf
 from bs4 import BeautifulSoup as bs
 from datetime import datetime as dt, timedelta
+from bottle import Bottle
 
 BASE_URL = "https://www.itsnicethat.com"
 MAX_ITEMS = 20
@@ -54,4 +55,10 @@ def page_to_items(page):
     raw_items = soup.findAll(class_="listing-item")[:MAX_ITEMS]
     return [raw_item_to_item(s) for s in raw_items]
 
-JSONFeedWrapper(BASE_URL, page_to_items, MAX_ITEMS).serve()
+# bottle = Bottle()
+# JSONFeedWrapper(bottle, BASE_URL, page_to_items, MAX_ITEMS)
+# # Not using Google App Engine; gotta call run.
+# bottle.run()
+
+app = jfw.initialize(BASE_URL, page_to_items, MAX_ITEMS)
+app.run()
