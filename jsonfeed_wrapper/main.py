@@ -19,13 +19,14 @@ def get(url):
 # initialize returns a Bottle app to serve the generated JSON feed and its
 # favicon.
 #
+# title: string - the title for this JSON Feed.
 # base_url: string - the root URL for all pages for which this app will serve
 #   feeds. Requests for category feeds will simply append the category to this
 #   base URL.
 # page_to_items: (requests.Response) => jf.Item[] - a function that transforms
 #   a response from the target site into a list of corresponding jsonfeed items.
 # max_items: int - the maximum number of items this feed will serve.
-def initialize(base_url, page_to_items, max_items=20):
+def initialize(title, base_url, page_to_items, max_items=20):
     # Avoid double-forward-slases.
     make_url = lambda category: base_url + "/" + category
     if base_url[-1] == "/":
@@ -35,7 +36,7 @@ def initialize(base_url, page_to_items, max_items=20):
     def handle(category=""):
         specific_url = make_url(category)
         res = jf.Feed(
-            title="FIXME",
+            title=title,
             home_page_url=specific_url,
             feed_url=request.url,
             items=page_to_items(get(specific_url))[:max_items]

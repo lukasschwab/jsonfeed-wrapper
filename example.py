@@ -54,5 +54,5 @@ def page_to_items(page):
 
 # app is a Bottle app; in the appengine environment it's run automatically, but
 # in this non-appengine example we need to call app.run() ourselves.
-app = jfw.initialize(BASE_URL, page_to_items, MAX_ITEMS)
+app = jfw.initialize("Example Feed", BASE_URL, page_to_items, MAX_ITEMS)
 app.run()
