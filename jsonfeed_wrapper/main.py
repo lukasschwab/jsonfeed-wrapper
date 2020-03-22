@@ -47,7 +47,7 @@ def initialize(base_url, page_to_items, max_items=20):
     bottle = Bottle()
     @bottle.route('/favicon.ico')
     def favicon():
-        return redirect(base_url + '/favicon.ico')
+        return redirect(make_url('favicon.ico'))
     @bottle.route('/')
     def serve_root():
         return handle()

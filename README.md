@@ -33,7 +33,9 @@ These may be helpful examples for desigining a `page_to_items` function.
 
 + `example.py` is a clone of [`itsnicethat-feed`](https://github.com/lukasschwab/itsnicethat-feed) that runs without requiring other App Engine helpers.
 
-+ [itsnicethat-feed](https://github.com/lukasschwab/itsnicethat-feed): a generated feed for [It's Nice That](https://www.itsnicethat.com/).
++ [`itsnicethat-feed`](https://github.com/lukasschwab/itsnicethat-feed): a generated feed for [It's Nice That](https://www.itsnicethat.com/).
+
++ [`atlas-feed`](https://github.com/lukasschwab/itsnicethat-feed): a generated feed for [Atlas of Places](https://atlasofplaces.com/).
 
 ## To do
 
