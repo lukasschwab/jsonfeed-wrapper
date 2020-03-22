@@ -2,7 +2,6 @@ import jsonfeed_wrapper as jfw
 import jsonfeed as jf
 from bs4 import BeautifulSoup as bs
 from datetime import datetime as dt, timedelta
-from bottle import Bottle
 
 BASE_URL = "https://www.itsnicethat.com"
 MAX_ITEMS = 20
@@ -31,8 +30,6 @@ def marshalItsNiceThatDate(string_date):
         return marshalItsNiceThatHoursAgo(string_date)
 
 def raw_item_to_item(listing):
-    # Images are lazy-loaded with JS on their site.
-    # image_src = listing.find("img")["src"]
     url = listing.find('a')['href']
     title = listing.find(class_="listing-item-title").text
     raw_tags = listing.findAll(class_="tag")
@@ -55,10 +52,7 @@ def page_to_items(page):
     raw_items = soup.findAll(class_="listing-item")[:MAX_ITEMS]
     return [raw_item_to_item(s) for s in raw_items]
 
-# bottle = Bottle()
-# JSONFeedWrapper(bottle, BASE_URL, page_to_items, MAX_ITEMS)
-# # Not using Google App Engine; gotta call run.
-# bottle.run()
-
+# app is a Bottle app; in the appengine environment it's run automatically, but
+# in this non-appengine example we need to call app.run() ourselves.
 app = jfw.initialize(BASE_URL, page_to_items, MAX_ITEMS)
 app.run()
