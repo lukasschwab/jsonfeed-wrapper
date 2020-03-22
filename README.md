@@ -37,6 +37,4 @@ These may be helpful examples for desigining a `page_to_items` function.
 
 ## To do
 
-+ Better documentation
-+ Favicon support
-+ Refactor `atlas-feed`, `itsnicethat-feed` to use this.
++ Refactor `atlas-feed` to use this.
