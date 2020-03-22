@@ -15,7 +15,7 @@ def get(url):
         )
     return page
 
-def initialize(base_url, page_to_items, max_items):
+def initialize(base_url, page_to_items, max_items=20):
     def handle(category=""):
         specific_url = base_url + "/" + category
         res = jf.Feed(
