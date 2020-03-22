@@ -1,6 +1,6 @@
 import requests
 import jsonfeed as jf
-from bottle import route, request, response, run, HTTPError
+from bottle import route, redirect, request, response, run, HTTPError
 
 ERROR_MESSAGES = {
     404: "This page could not be resolved."
@@ -33,7 +33,11 @@ class JSONFeedWrapper:
         response.content_type = 'application/json'
         return res.toJSON()
 
-    def serve(self):
+    def serve(self, favicon_root=None):
+        @route('/favicon.ico')
+        def favicon():
+            return redirect(self.base_url + '/favicon.ico')
+
         @route('/')
         def entry():
             return self.handle()
@@ -42,4 +46,4 @@ class JSONFeedWrapper:
         def subset(category):
             return self.handle(category=category)
 
-        run(host='localhost', port=8080, debug=True)
+        run()
