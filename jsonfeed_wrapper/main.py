@@ -20,18 +20,13 @@ def get(url):
 # favicon.
 #
 # title: string - the title for this JSON Feed.
-# base_url: string - the root URL for all pages for which this app will serve
-#   feeds. Requests for category feeds will simply append the category to this
-#   base URL.
+# base_url_format: string - the URL format for all pages for which this app will
+#   serve feeds.
 # page_to_items: (requests.Response) => jf.Item[] - a function that transforms
 #   a response from the target site into a list of corresponding jsonfeed items.
 # max_items: int - the maximum number of items this feed will serve.
-def initialize(title, base_url, page_to_items, max_items=20):
-    # Avoid double-forward-slases.
-    make_url = lambda category: base_url + "/" + category
-    if base_url[-1] == "/":
-        make_url = lambda category: base_url + category
-
+def initialize(title, base_url_format, page_to_items, max_items=20):
+    make_url = lambda category: base_url_format.format(category=category)
     # Define primary handler.
     def handle(category=""):
         specific_url = make_url(category)
