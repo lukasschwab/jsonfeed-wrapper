@@ -49,12 +49,12 @@ def raw_item_to_item(listing):
         content_text=title
     )
 
-def page_to_items(page):
-    soup = bs(page.text, 'html.parser')
+def response_to_items(response):
+    soup = bs(response.text, 'html.parser')
     raw_items = soup.findAll(class_="listing-item")[:MAX_ITEMS]
     return [raw_item_to_item(s) for s in raw_items]
 
 # app is a Bottle app; in the appengine environment it's run automatically, but
 # in this non-appengine example we need to call app.run() ourselves.
-app = jfw.initialize("Example Feed", BASE_URL_FORMAT, page_to_items, MAX_ITEMS)
+app = jfw.initialize("Example Feed", BASE_URL_FORMAT, response_to_items, MAX_ITEMS)
 app.run()

@@ -8,13 +8,13 @@ ERROR_MESSAGES = {
 
 # get wraps requests.get with some basic error handling.
 def get(url):
-    page = requests.get(url)
-    if not page.ok:
+    response = requests.get(url)
+    if not response.ok:
         raise HTTPError(
-            status=page.status_code,
-            body=ERROR_MESSAGES.get(page.status_code)
+            status=response.status_code,
+            body=ERROR_MESSAGES.get(response.status_code)
         )
-    return page
+    return response
 
 # initialize returns a Bottle app to serve the generated JSON feed and its
 # favicon.
@@ -22,10 +22,11 @@ def get(url):
 # title: string - the title for this JSON Feed.
 # base_url_format: string - the URL format for all pages for which this app will
 #   serve feeds.
-# page_to_items: (requests.Response) => jf.Item[] - a function that transforms
-#   a response from the target site into a list of corresponding jsonfeed items.
+# response_to_items: (requests.Response) => jf.Item[] - a function that
+#   transforms a response from the target site into a list of corresponding
+#   jsonfeed items.
 # max_items: int - the maximum number of items this feed will serve.
-def initialize(title, base_url_format, page_to_items, max_items=20):
+def initialize(title, base_url_format, response_to_items, max_items=20):
     make_url = lambda category: base_url_format.format(category=category)
     # Define primary handler.
     def handle(category=""):
@@ -34,7 +35,7 @@ def initialize(title, base_url_format, page_to_items, max_items=20):
             title=title,
             home_page_url=specific_url,
             feed_url=request.url,
-            items=page_to_items(get(specific_url))[:max_items]
+            items=response_to_items(get(specific_url))[:max_items]
         )
         response.content_type = 'application/json'
         return res.toJSON()
