@@ -5,7 +5,7 @@ from datetime import datetime as dt, timedelta
 
 # The old-style base URL is used to calculate item URLs.
 BASE_URL = "https://www.itsnicethat.com"
-BASE_URL_FORMAT = "https://www.itsnicethat.com/{category}"
+BASE_URL_FORMAT = BASE_URL + "/{category}"
 MAX_ITEMS = 20
 
 # Tries to match e.g. '10 hours ago'; otherwise defaults to now.

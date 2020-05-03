@@ -37,6 +37,8 @@ These may be helpful examples for desigining a `page_to_items` function.
 
 + [`atlas-feed`](https://github.com/lukasschwab/itsnicethat-feed): a generated feed for [Atlas of Places](https://atlasofplaces.com/).
 
++ [`bandcamp-feeds`](https://github.com/lukasschwab/bandcamp-feeds): generated feeds for Bandcamp artist profiles.
+
 ## To do
 
 + Refactor `atlas-feed` to use this.
