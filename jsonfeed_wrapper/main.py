@@ -7,8 +7,8 @@ ERROR_MESSAGES = {
 }
 
 # get wraps requests.get with some basic error handling.
-def get(url):
-    response = requests.get(url)
+def get(url, user_agent):
+    response = requests.get(url, headers={'User-agent': user_agent})
     if not response.ok:
         raise HTTPError(
             status=response.status_code,
@@ -26,7 +26,13 @@ def get(url):
 #   transforms a response from the target site into a list of corresponding
 #   jsonfeed items.
 # max_items: int - the maximum number of items this feed will serve.
-def initialize(title, base_url_format, response_to_items, max_items=20):
+def initialize(
+        title,
+        base_url_format,
+        response_to_items,
+        max_items=20,
+        user_agent="jsonfeed-wrapper"
+    ):
     make_url = lambda category: base_url_format.format(category=category)
     # Define primary handler.
     def handle(category=""):
@@ -35,7 +41,7 @@ def initialize(title, base_url_format, response_to_items, max_items=20):
             title=title,
             home_page_url=specific_url,
             feed_url=request.url,
-            items=response_to_items(get(specific_url))[:max_items]
+            items=response_to_items(get(specific_url, user_agent))[:max_items]
         )
         response.content_type = 'application/json'
         return res.toJSON()
