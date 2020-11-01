@@ -24,7 +24,7 @@ class JSONFeedWrapper:
             max_items=20,
             user_agent="jsonfeed_wrapper"
         ):
-        self.title = title;
+        self.title = title
         self.base_url_format = base_url_format
         self.response_to_items = response_to_items
         self.max_items = max_items

@@ -1,6 +1,13 @@
+# This is a clone of https://github.com/lukasschwab/itsnicethat-feed that
+# demonstrates using jsonfeed_wrapper to generate a Bottle app which runs
+# neatly in a Google App Engine environment.
+#
+# NOTE: all but the last line of code is shared with the other example.
+#
+# Run `make bottle-example`.
+
 import jsonfeed_wrapper as jfw
 import jsonfeed as jf
-
 from bs4 import BeautifulSoup as bs
 from datetime import datetime as dt, timedelta
 
@@ -56,6 +63,7 @@ def response_to_items(response):
     return [raw_item_to_item(s) for s in raw_items]
 
 wrapper = jfw.JSONFeedWrapper("Example Feed", BASE_URL_FORMAT, response_to_items, MAX_ITEMS)
+
 # app is a Bottle app; in the appengine environment it's run automatically, but
 # in this non-appengine example we need to call app.run() ourselves.
 app = wrapper.as_bottle_app()

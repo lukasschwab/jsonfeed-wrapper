@@ -1,3 +1,11 @@
+# This is a clone of https://github.com/lukasschwab/itsnicethat-feed that
+# demonstrates using jsonfeed_wrapper to generate a Cloud Function entry
+# point.
+#
+# NOTE: all but the last line of code is shared with the other example.
+#
+# Run `make cloud-function-example`.
+
 import jsonfeed_wrapper as jfw
 import jsonfeed as jf
 from bs4 import BeautifulSoup as bs
@@ -56,4 +64,5 @@ def response_to_items(response):
 
 wrapper = jfw.JSONFeedWrapper("Example Feed", BASE_URL_FORMAT, response_to_items, MAX_ITEMS)
 
+# main is a Cloud Function entry point.
 main = wrapper.as_cloud_function()

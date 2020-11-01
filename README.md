@@ -49,13 +49,11 @@ target =  wrapper.as_cloud_function()
 
 Where `target` is your Cloud Function target, the function invoked each time your Cloud Function receives a request.
 
+For example, see `cloud-function-example.py`.
+
 ## Examples
 
 These may be helpful examples for desigining a `page_to_items` function.
-
-+ `bottle-example.py` is a clone of [`itsnicethat-feed`](https://github.com/lukasschwab/itsnicethat-feed) that runs without requiring other App Engine helpers.
-
-+ `cloud-function-example.py` is a clone of [`itsnicethat-feed`](https://github.com/lukasschwab/itsnicethat-feed) 
 
 + [`itsnicethat-feed`](https://github.com/lukasschwab/itsnicethat-feed): a generated feed for [It's Nice That](https://www.itsnicethat.com/).
 
