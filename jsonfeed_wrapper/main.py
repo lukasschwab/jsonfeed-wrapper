@@ -1,60 +1,86 @@
 import requests
 import jsonfeed as jf
+import json
 from bottle import Bottle, redirect, request, response, HTTPError
+
 
 ERROR_MESSAGES = {
     404: "This page could not be resolved."
 }
 
-# get wraps requests.get with some basic error handling.
-def get(url, user_agent):
-    response = requests.get(url, headers={'User-agent': user_agent})
-    if not response.ok:
-        raise HTTPError(
-            status=response.status_code,
-            body=ERROR_MESSAGES.get(response.status_code)
-        )
-    return response
+log = lambda request: print(json.dumps(dict(
+    severity="INFO",
+    message="Serving feed",
+    request_url=request.url,
+    trace_header=request.headers.get('X-Cloud-Trace-Context')
+)))
 
-# initialize returns a Bottle app to serve the generated JSON feed and its
-# favicon.
-#
-# title: string - the title for this JSON Feed.
-# base_url_format: string - the URL format for all pages for which this app will
-#   serve feeds.
-# response_to_items: (requests.Response) => jf.Item[] - a function that
-#   transforms a response from the target site into a list of corresponding
-#   jsonfeed items.
-# max_items: int - the maximum number of items this feed will serve.
-def initialize(
-        title,
-        base_url_format,
-        response_to_items,
-        max_items=20,
-        user_agent="jsonfeed-wrapper"
-    ):
-    make_url = lambda category: base_url_format.format(category=category)
-    # Define primary handler.
-    def handle(category=""):
-        specific_url = make_url(category)
-        res = jf.Feed(
-            title=title,
+class JSONFeedWrapper:
+    def __init__(
+            self,
+            title,
+            base_url_format,    
+            response_to_items,
+            max_items=20,
+            user_agent="jsonfeed_wrapper"
+        ):
+        self.title = title;
+        self.base_url_format = base_url_format
+        self.response_to_items = response_to_items
+        self.max_items = max_items
+        self.user_agent = user_agent
+    
+
+    def _get(self, url):
+        response = requests.get(url, headers={'User-agent': self.user_agent})
+        if not response.ok:
+            raise HTTPError(
+                status=response.status_code,
+                body=ERROR_MESSAGES.get(response.status_code)
+            )
+        return response
+    
+
+    def _make_url(self, category):
+        return self.base_url_format.format(category=category)
+
+
+    # NOTE: trying to default these arguments to the Bubble variables...
+    def _feed(self, request_url, category=""):
+        specific_url = self._make_url(category)
+        items = self.response_to_items(self._get(specific_url))[:self.max_items]
+        return jf.Feed(
+            title=self.title,
             home_page_url=specific_url,
-            feed_url=request.url,
-            items=response_to_items(get(specific_url, user_agent))[:max_items]
-        )
-        response.content_type = 'application/json'
-        return res.toJSON()
+            feed_url=request_url,
+            items=items,
+        ).toJSON()
 
-    # Construct bottle app.
-    bottle = Bottle()
-    @bottle.route('/favicon.ico')
-    def favicon():
-        return redirect(make_url('favicon.ico'))
-    @bottle.route('/')
-    def serve_root():
-        return handle()
-    @bottle.route('/<category>')
-    def serve_category(category):
-        return handle(category=category)
-    return bottle;
+
+    def as_bottle_app(self):
+        bottle = Bottle()
+        @bottle.route('/favicon.ico')
+        def favicon():
+            return redirect(self._make_url('favicon.ico'))
+        @bottle.route('/')
+        def serve_root():
+            log(request)
+            response.content_type = 'application/json'
+            return self._feed(request.url)
+        @bottle.route('/<category>')
+        def serve_category(category):
+            log(request)
+            response.content_type = 'application/json'
+            return self._feed(request.url, category=category)
+        return bottle
+    
+    def as_cloud_function(self):
+        def entry_point(request):
+            log(request)
+            path = request.path.strip("/")
+            if path == "favicon.ico":
+                return redirect(self._make_url('favicon.ico'))
+            category = path if len(path) > 0 else ""
+            feed = self._feed(request.url, category)
+            return (feed, 200, {'Content-Type': 'application/json'})
+        return entry_point
