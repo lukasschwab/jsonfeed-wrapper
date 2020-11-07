@@ -19,7 +19,7 @@ class JSONFeedWrapper:
     def __init__(
             self,
             title,
-            base_url_format,    
+            base_url_format,
             response_to_items,
             max_items=20,
             user_agent="jsonfeed_wrapper"
@@ -29,7 +29,7 @@ class JSONFeedWrapper:
         self.response_to_items = response_to_items
         self.max_items = max_items
         self.user_agent = user_agent
-    
+
 
     def _get(self, url):
         response = requests.get(url, headers={'User-agent': self.user_agent})
@@ -39,7 +39,7 @@ class JSONFeedWrapper:
                 body=ERROR_MESSAGES.get(response.status_code)
             )
         return response
-    
+
 
     def _make_url(self, category):
         return self.base_url_format.format(category=category)
@@ -65,15 +65,15 @@ class JSONFeedWrapper:
         @bottle.route('/')
         def serve_root():
             log(request)
-            response.content_type = 'application/json'
+            response.content_type = 'application/feed+json'
             return self._feed(request.url)
         @bottle.route('/<category>')
         def serve_category(category):
             log(request)
-            response.content_type = 'application/json'
+            response.content_type = 'application/feed+json'
             return self._feed(request.url, category=category)
         return bottle
-    
+
     def as_cloud_function(self):
         def entry_point(request):
             log(request)
@@ -82,5 +82,5 @@ class JSONFeedWrapper:
                 return redirect(self._make_url('favicon.ico'))
             category = path if len(path) > 0 else ""
             feed = self._feed(request.url, category)
-            return (feed, 200, {'Content-Type': 'application/json'})
+            return (feed, 200, {'Content-Type': 'application/feed+json'})
         return entry_point
