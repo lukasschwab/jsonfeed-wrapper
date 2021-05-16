@@ -1,3 +1,4 @@
+from typing import Callable, List
 import requests
 import jsonfeed as jf
 import json
@@ -8,21 +9,24 @@ ERROR_MESSAGES = {
     404: "This page could not be resolved."
 }
 
-log = lambda request: print(json.dumps(dict(
-    severity="INFO",
-    message="Serving feed",
-    request_url=request.url,
-    trace_header=request.headers.get('X-Cloud-Trace-Context')
-)))
+
+def log_request(request):
+    print(json.dumps(dict(
+        severity="INFO",
+        message="Serving feed",
+        request_url=request.url,
+        trace_header=request.headers.get('X-Cloud-Trace-Context')
+    )))
+
 
 class JSONFeedWrapper:
     def __init__(
             self,
-            title,
-            base_url_format,
-            response_to_items,
-            max_items=20,
-            user_agent="jsonfeed_wrapper"
+            title: str,
+            base_url_format: str,
+            response_to_items: Callable[[requests.Response], List[jf.Item]],
+            max_items: int = 20,
+            user_agent: str = "jsonfeed_wrapper"
         ):
         self.title = title
         self.base_url_format = base_url_format
@@ -31,7 +35,7 @@ class JSONFeedWrapper:
         self.user_agent = user_agent
 
 
-    def _get(self, url):
+    def _get(self, url: str) -> requests.Response:
         response = requests.get(url, headers={'User-agent': self.user_agent})
         if not response.ok:
             raise HTTPError(
@@ -41,12 +45,12 @@ class JSONFeedWrapper:
         return response
 
 
-    def _make_url(self, category):
+    def _make_url(self, category: str) -> str:
         return self.base_url_format.format(category=category)
 
 
     # NOTE: trying to default these arguments to the Bubble variables...
-    def _feed(self, request_url, category=""):
+    def _feed(self, request_url: str, category: str = "") -> str:
         specific_url = self._make_url(category)
         items = self.response_to_items(self._get(specific_url))[:self.max_items]
         return jf.Feed(
@@ -57,26 +61,26 @@ class JSONFeedWrapper:
         ).toJSON()
 
 
-    def as_bottle_app(self):
+    def as_bottle_app(self) -> Bottle:
         bottle = Bottle()
         @bottle.route('/favicon.ico')
         def favicon():
             return redirect(self._make_url('favicon.ico'))
         @bottle.route('/')
         def serve_root():
-            log(request)
+            log_request(request)
             response.content_type = 'application/feed+json'
             return self._feed(request.url)
         @bottle.route('/<category>')
         def serve_category(category):
-            log(request)
+            log_request(request)
             response.content_type = 'application/feed+json'
             return self._feed(request.url, category=category)
         return bottle
 
-    def as_cloud_function(self):
+    def as_cloud_function(self) -> Callable:
         def entry_point(request):
-            log(request)
+            log_request(request)
             path = request.path.strip("/")
             if path == "favicon.ico":
                 return redirect(self._make_url('favicon.ico'))
