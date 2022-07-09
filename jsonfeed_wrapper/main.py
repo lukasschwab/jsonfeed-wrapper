@@ -58,7 +58,7 @@ class JSONFeedWrapper:
             home_page_url=specific_url,
             feed_url=request_url,
             items=items,
-        ).toJSON()
+        ).to_json()
 
 
     def as_bottle_app(self) -> Bottle:
