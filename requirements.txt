@@ -1,3 +1,3 @@
-bottle==0.12.20
+bottle==0.13.4
 requests==2.32.4
-git+https://github.com/lukasschwab/jsonfeed.git@1.0.0#egg=jsonfeed
+jsonfeed-util==1.2.0
