@@ -36,8 +36,19 @@ class JSONFeedWrapper:
 
 
     def _get(self, url: str) -> requests.Response:
+        print(json.dumps(dict(
+            severity="INFO",
+            message="Requesting upstream URL",
+            url=url,
+        )))
         response = requests.get(url, headers={'User-agent': self.user_agent})
         if not response.ok:
+            print(json.dumps(dict(
+                severity="ERROR",
+                message="Failed fetching upstream URL: non-OK status",
+                status=response.status_code,
+                text=response.text,
+            )))
             raise HTTPError(
                 status=response.status_code,
                 body=ERROR_MESSAGES.get(response.status_code)
